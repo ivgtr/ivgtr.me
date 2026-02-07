@@ -5,11 +5,13 @@ config.autoAddCss = false;
 
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import "@/styles/globals.css";
-import { RetroBackground } from "@/components/retro/RetroBackground";
+import { DesktopBackground } from "@/components/os/DesktopBackground";
 import { KonamiProvider } from "@/components/retro/KonamiProvider";
+import { MenuBarProvider } from "@/components/os/MenuBarContext";
+import { MenuBar } from "@/components/os/MenuBar";
 
 export const metadata: Metadata = {
-	title: "tenori.me - 個人サイト",
+	title: "ivgtr.me - 個人サイト",
 	description: "卵の殻を破らねば、雛鳥は生まれずに死んでいく。",
 };
 
@@ -20,10 +22,13 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="ja">
-			<body className={`${marumonica.variable} ${aahub.variable} retro-site`}>
+			<body className={`${marumonica.variable} ${aahub.variable} os-site`}>
 				<KonamiProvider>
-					<RetroBackground />
-					{children}
+					<MenuBarProvider>
+						<DesktopBackground />
+						<MenuBar />
+						<main className="os-workspace">{children}</main>
+					</MenuBarProvider>
 				</KonamiProvider>
 			</body>
 		</html>
