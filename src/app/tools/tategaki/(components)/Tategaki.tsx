@@ -66,7 +66,7 @@ export const Tategaki = () => {
 			<div>
 				<h2>入力</h2>
 				<TextArea
-					className="text:"
+					className=""
 					defaultValue={rawText}
 					rows={2}
 					onChange={(e) => setRawText(e.target.value)}
@@ -75,7 +75,7 @@ export const Tategaki = () => {
 
 			<div className="mt-8">
 				<h2>出力</h2>
-				<pre>{rotatedText}</pre>
+				<pre className="overflow-x-auto">{rotatedText}</pre>
 				<Button
 					className="bg-blue-500 mt-4"
 					onClick={() => {

@@ -97,7 +97,7 @@ export const XCharacterPromptGenerator = () => {
 				</div>
 			</div>
 
-			<div className="bg-white rounded-xl shadow-xl p-6">
+			<div className="bg-white rounded-xl shadow-xl p-4">
 				<div className="flex mb-6 border-b">
 					<button
 						onClick={() => setActiveTab("input")}
@@ -262,7 +262,7 @@ export const XCharacterPromptGenerator = () => {
 				)}
 			</div>
 
-			<div className="bg-white rounded-xl shadow-md p-6">
+			<div className="bg-white rounded-xl shadow-md p-4">
 				<h2 className="text-xl font-bold text-gray-800 mb-4">使用方法</h2>
 				<div className="space-y-4">
 					<div>
