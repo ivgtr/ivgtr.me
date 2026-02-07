@@ -374,10 +374,12 @@ select {
 table {
 	width: 100%;
 }
-img {
-	max-width: 100%;
-	height: auto;
-	border-radius: 8px;
+@layer base {
+	img {
+		max-width: 100%;
+		height: auto;
+		border-radius: 8px;
+	}
 }
 code {
 	padding: 2px 5px;
@@ -964,6 +966,20 @@ ul.list {
 
 .os-navigator-tool-content {
 	font-size: 14px;
+	overflow: hidden;
+}
+
+.os-navigator-tool-content img {
+	max-width: 100%;
+}
+
+.os-navigator-tool-content canvas {
+	max-width: 100%;
+}
+
+.os-navigator-tool-content pre {
+	overflow-x: auto;
+	max-width: 100%;
 }
 
 /* Audio Player Window */
