@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# development screenshots
+copland-os-*.png
+
+# playwright mcp
+.playwright-mcp/
