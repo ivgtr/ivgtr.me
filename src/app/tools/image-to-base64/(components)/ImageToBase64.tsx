@@ -54,7 +54,7 @@ export const ImageToBase64 = () => {
 				</div>
 			</div>
 			<div>
-				{image && <img src={image} alt="preview" />}
+				{image && <img src={image} alt="preview" className="max-w-full h-auto mt-4" />}
 				{image && (
 					<div>
 						<input

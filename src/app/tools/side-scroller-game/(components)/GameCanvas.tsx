@@ -17,43 +17,37 @@ interface CanvasDimensions {
 
 export const GameCanvas = ({ gameState }: GameCanvasProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [canvasDimensions, setCanvasDimensions] = useState<CanvasDimensions>({
     width: GAME_CONSTANTS.CANVAS_WIDTH,
     height: GAME_CONSTANTS.CANVAS_HEIGHT,
   });
 
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
-    
+    const container = containerRef.current;
+    if (!container) return;
+
     const updateCanvasSize = () => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => {
-        const isMobile = window.innerWidth < 768;
-        const availableWidth = window.innerWidth - 32;
-        const availableHeight = window.innerHeight * 0.6;
-        
-        if (isMobile) {
-          const aspectRatio = GAME_CONSTANTS.CANVAS_WIDTH / GAME_CONSTANTS.CANVAS_HEIGHT;
-          let width = Math.min(availableWidth, GAME_CONSTANTS.CANVAS_WIDTH);
-          let height = width / aspectRatio;
-          
-          if (height > availableHeight) {
-            height = availableHeight;
-            width = height * aspectRatio;
-          }
-          
-          setCanvasDimensions({ width, height });
-        } else {
-          setCanvasDimensions({ width: GAME_CONSTANTS.CANVAS_WIDTH, height: GAME_CONSTANTS.CANVAS_HEIGHT });
-        }
-      }, 100);
+      const containerWidth = container.clientWidth;
+      const aspectRatio = GAME_CONSTANTS.CANVAS_WIDTH / GAME_CONSTANTS.CANVAS_HEIGHT;
+
+      if (containerWidth < GAME_CONSTANTS.CANVAS_WIDTH) {
+        const width = containerWidth;
+        const height = width / aspectRatio;
+        setCanvasDimensions({ width, height });
+      } else {
+        setCanvasDimensions({ width: GAME_CONSTANTS.CANVAS_WIDTH, height: GAME_CONSTANTS.CANVAS_HEIGHT });
+      }
     };
 
+    const observer = new ResizeObserver(() => {
+      updateCanvasSize();
+    });
+    observer.observe(container);
     updateCanvasSize();
-    window.addEventListener('resize', updateCanvasSize);
+
     return () => {
-      window.removeEventListener('resize', updateCanvasSize);
-      clearTimeout(timeoutId);
+      observer.disconnect();
     };
   }, []);
 
@@ -281,12 +275,14 @@ export const GameCanvas = ({ gameState }: GameCanvasProps) => {
   }, [gameState, canvasDimensions]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      width={canvasDimensions.width}
-      height={canvasDimensions.height}
-      className="border-2 border-gray-400 rounded-lg max-w-full"
-      style={{ display: "block", margin: "0 auto" }}
-    />
+    <div ref={containerRef} style={{ width: "100%" }}>
+      <canvas
+        ref={canvasRef}
+        width={canvasDimensions.width}
+        height={canvasDimensions.height}
+        className="border-2 border-gray-400 rounded-lg max-w-full"
+        style={{ display: "block", margin: "0 auto" }}
+      />
+    </div>
   );
 };

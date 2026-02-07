@@ -310,7 +310,7 @@ export const Stage = ({ mode, splitHeight = 40 }: Props) => {
 					)}
 				</div>
 			</div>
-			<div className="flex gap-4 mt-4">
+			<div className="flex flex-wrap gap-2 mt-4">
 				<Button onClick={resetImage} className="bg-gray-500" disabled={!image}>
 					リセット
 				</Button>
