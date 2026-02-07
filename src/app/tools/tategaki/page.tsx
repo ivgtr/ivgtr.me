@@ -1,16 +1,19 @@
-import { Header } from "@/components/Header";
+import { Window } from "@/components/os/Window";
 import { Tategaki } from "./(components)/Tategaki";
 
 export default function TategakiPage() {
 	return (
-		<div>
-			<Header to="/tools" />
-			<main>
-				<h2>横書きの内容を縦書きするやつ</h2>
-				<section>
+		<div className="os-subpage-workspace">
+			<div className="os-subpage-window">
+				<Window
+					id="tategaki"
+					title="横書きの内容を縦書きするやつ"
+					closable={false}
+					minimizable={false}
+				>
 					<Tategaki />
-				</section>
-			</main>
+				</Window>
+			</div>
 		</div>
 	);
 }

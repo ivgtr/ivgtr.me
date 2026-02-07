@@ -1,14 +1,19 @@
-import { Header } from "@/components/Header";
+import { Window } from "@/components/os/Window";
 import { ArticlesContent } from "./(components)/ArticlesContent";
 
 export default function Articles() {
 	return (
-		<div>
-			<Header to="/" />
-			<main>
-				<h1>Articles</h1>
-				<ArticlesContent />
-			</main>
+		<div className="os-subpage-workspace">
+			<div className="os-subpage-window">
+				<Window
+					id="articles"
+					title="Articles - /home/ivgtr/articles/"
+					closable={false}
+					minimizable={false}
+				>
+					<ArticlesContent />
+				</Window>
+			</div>
 		</div>
 	);
 }

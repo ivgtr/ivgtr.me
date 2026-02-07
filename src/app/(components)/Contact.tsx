@@ -21,8 +21,8 @@ const accounts = [
 	},
 	{
 		title: "Bluesky",
-		alt: "tenori",
-		url: "https://bsky.app/profile/tenori.me",
+		alt: "ivgtr",
+		url: "https://bsky.app/profile/ivgtr.me",
 		icon: faBluesky,
 		color: "bg-sky-400",
 		emoji: "🦋"
