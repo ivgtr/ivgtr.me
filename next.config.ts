@@ -1,12 +1,18 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-	/* config options here */
+	reactStrictMode: true,
 	images: {
-		domains: ["pixel-image.vercel.app", "crop-icon.vercel.app"],
-	},
-	eslint: {
-		ignoreDuringBuilds: true,
+		remotePatterns: [
+			{
+				protocol: "https",
+				hostname: "pixel-image.vercel.app",
+			},
+			{
+				protocol: "https",
+				hostname: "crop-icon.vercel.app",
+			},
+		],
 	},
 };
 

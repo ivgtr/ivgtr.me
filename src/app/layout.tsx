@@ -4,7 +4,7 @@ import { config } from "@fortawesome/fontawesome-svg-core";
 config.autoAddCss = false;
 
 import "@fortawesome/fontawesome-svg-core/styles.css";
-import "@/styles/globals.scss";
+import "@/styles/globals.css";
 import { RetroBackground } from "@/components/retro/RetroBackground";
 import { KonamiProvider } from "@/components/retro/KonamiProvider";
 
