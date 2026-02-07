@@ -11,7 +11,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Architecture Overview
 
-This is a Next.js 15 personal website (tenori.me) using the App Router with React 19. The site features a personal portfolio with integrated tools and content aggregation.
+This is a Next.js 15 personal website (ivgtr.me) using the App Router with React 19. The site features a personal portfolio with integrated tools and content aggregation.
 
 ### Key Architecture Patterns
 
