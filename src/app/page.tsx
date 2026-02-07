@@ -1,99 +1,110 @@
-import { Icon } from "@/components/Icon";
-import { Profile } from "./(components)/Profile";
-import { PageLink } from "./(components)/PageLink";
-import { Contact } from "./(components)/Contact";
-import { Footer } from "@/components/Footer";
-import { RetroBorder } from "@/components/retro/RetroBorder";
-import { BlinkingText } from "@/components/retro/BlinkingText";
-import { Marquee } from "@/components/retro/Marquee";
-import { RetroVisitorCounter } from "@/components/retro/RetroVisitorCounter";
-import { DigitalClock } from "@/components/retro/DigitalClock";
-import { WebRing } from "@/components/retro/WebRing";
-import { RetroGuestbook } from "@/components/retro/RetroGuestbook";
-import { RetroMidiPlayer } from "@/components/retro/RetroMidiPlayer";
-import { AAWelcome } from "@/components/retro/AAWelcome";
-import { AABoard } from "@/components/retro/AABoard";
-import { AAFooter } from "@/components/retro/AAFooter";
+"use client";
+
+import { useEffect } from "react";
+import { Window } from "@/components/os/Window";
+import { StatusBar } from "@/components/os/StatusBar";
+import { useWindowManager } from "@/hooks/useWindowManager";
+import { useMenuBar } from "@/components/os/MenuBarContext";
+import { ProfileWindow } from "./(components)/ProfileWindow";
+import { NavigatorWindow } from "./(components)/NavigatorWindow";
+import { AudioPlayerWindow } from "./(components)/AudioPlayerWindow";
+
+const initialWindows = [
+	{ id: "profile", isOpen: true, isMinimized: false, position: { x: 16, y: 16 } },
+	{ id: "navigator", isOpen: true, isMinimized: false, position: { x: 380, y: 16 } },
+	{ id: "audio", isOpen: true, isMinimized: false, position: { x: 16, y: 480 } },
+];
+
+const windowTitles: Record<string, string> = {
+	profile: "Profile - ivgtr",
+	navigator: "Navigator - /home/ivgtr/",
+	audio: "Audio Player",
+};
 
 export default function Home() {
+	const { windows, focus, close, minimize, restore, getWindow } =
+		useWindowManager(initialWindows);
+	const { setActiveTitle } = useMenuBar();
+
+	const profileWin = getWindow("profile")!;
+	const navigatorWin = getWindow("navigator")!;
+	const audioWin = getWindow("audio")!;
+
+	useEffect(() => {
+		const activeWindows = windows.filter((w) => w.isOpen && !w.isMinimized);
+		if (activeWindows.length === 0) {
+			setActiveTitle("");
+			return;
+		}
+		const topWindow = activeWindows.reduce((a, b) =>
+			a.zIndex > b.zIndex ? a : b,
+		);
+		setActiveTitle(windowTitles[topWindow.id] ?? "");
+	}, [windows, setActiveTitle]);
+
+	const minimizedWindows = windows
+		.filter((w) => w.isOpen && w.isMinimized)
+		.map((w) => ({
+			id: w.id,
+			title:
+				w.id === "profile"
+					? "Profile"
+					: w.id === "navigator"
+						? "Navigator"
+						: "Audio Player",
+			onRestore: () => restore(w.id),
+		}));
+
 	return (
-		<div className="retro-layout min-h-screen">
-			<Marquee className="mb-4">
-				🌟 ようこそ tenori.me へ 🌟 個人サイト運営中 🌟 リンクフリー 🌟 相互リンク募集中 🌟
-			</Marquee>
-			
-			<AAWelcome />
-			
-			<div className="container mx-auto px-4 grid grid-cols-1 lg:grid-cols-4 gap-4 mt-4">
-				{/* Left Sidebar */}
-				<aside className="lg:col-span-1 space-y-4">
-					<RetroVisitorCounter />
-					<DigitalClock />
-					<RetroMidiPlayer />
-					<WebRing />
-				</aside>
+		<>
+			<div className="os-desktop-windows">
+				<Window
+					id="profile"
+					title="Profile - ivgtr"
+					defaultPosition={profileWin.position}
+					defaultSize={{ width: 320 }}
+					isOpen={profileWin.isOpen}
+					isMinimized={profileWin.isMinimized}
+					zIndex={profileWin.zIndex}
+					closable={false}
+					onMinimize={() => minimize("profile")}
+					onFocus={() => focus("profile")}
+				>
+					<ProfileWindow />
+				</Window>
 
-				{/* Main Content */}
-				<main className="lg:col-span-2">
-					<RetroBorder variant="gradient" className="mb-6">
-						<div className="text-center">
-							<h1 className="text-4xl font-bold mb-2 text-cyan-400">
-								<BlinkingText>✨ tenori.me ✨</BlinkingText>
-							</h1>
-							<p className="text-yellow-300 text-sm">～ 個人サイト ～</p>
-						</div>
-					</RetroBorder>
+				<Window
+					id="navigator"
+					title="Navigator - /home/ivgtr/"
+					defaultPosition={navigatorWin.position}
+					defaultSize={{ width: 520, height: 420 }}
+					isOpen={navigatorWin.isOpen}
+					isMinimized={navigatorWin.isMinimized}
+					zIndex={navigatorWin.zIndex}
+					closable={false}
+					onMinimize={() => minimize("navigator")}
+					onFocus={() => focus("navigator")}
+				>
+					<NavigatorWindow />
+				</Window>
 
-					<RetroBorder variant="classic" className="mb-6">
-						<section className="bg-white text-black">
-							<h2 className="text-2xl font-bold mb-4 text-purple-800 border-b-2 border-purple-800 pb-2">
-								💫 About me 💫
-							</h2>
-							<div className="flex flex-col md:flex-row gap-4">
-								<div className="flex-shrink-0">
-									<Icon />
-								</div>
-								<div className="flex-1">
-									<Profile />
-								</div>
-							</div>
-						</section>
-					</RetroBorder>
-
-					<RetroBorder variant="classic" className="mb-6">
-						<section className="bg-white text-black">
-							<h2 className="text-2xl font-bold mb-4 text-purple-800 border-b-2 border-purple-800 pb-2">
-								📧 Contact 📧
-							</h2>
-							<Contact />
-						</section>
-					</RetroBorder>
-
-					<RetroBorder variant="classic" className="mb-6">
-						<section className="bg-white text-black">
-							<h2 className="text-2xl font-bold mb-4 text-purple-800 border-b-2 border-purple-800 pb-2">
-								🔗 Link 🔗
-							</h2>
-							<PageLink />
-						</section>
-					</RetroBorder>
-				</main>
-
-				{/* Right Sidebar */}
-				<aside className="lg:col-span-1 space-y-4">
-					<RetroGuestbook />
-				</aside>
+				<Window
+					id="audio"
+					title="Audio Player"
+					defaultPosition={audioWin.position}
+					defaultSize={{ width: 340 }}
+					isOpen={audioWin.isOpen}
+					isMinimized={audioWin.isMinimized}
+					zIndex={audioWin.zIndex}
+					onClose={() => close("audio")}
+					onMinimize={() => minimize("audio")}
+					onFocus={() => focus("audio")}
+				>
+					<AudioPlayerWindow />
+				</Window>
 			</div>
 
-			<div className="container mx-auto px-4 mt-6">
-				<AABoard />
-			</div>
-
-			<div className="mt-6">
-				<AAFooter />
-			</div>
-
-			<Footer />
-		</div>
+			<StatusBar minimizedWindows={minimizedWindows} />
+		</>
 	);
 }
