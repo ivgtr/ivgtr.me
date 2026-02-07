@@ -1,30 +1,19 @@
-import { Header } from "@/components/Header";
+import { Window } from "@/components/os/Window";
 import { GlitchImage } from "./(components)/GlitchImage";
 
 export default function GlitchImagePage() {
 	return (
-		<div>
-			<Header to="/tools" />
-			<main>
-				<h2>画像をマウスでグリッチする</h2>
-				<section>
+		<div className="os-subpage-workspace">
+			<div className="os-subpage-window">
+				<Window
+					id="glitch-image"
+					title="画像をマウスでグリッチする"
+					closable={false}
+					minimizable={false}
+				>
 					<GlitchImage />
-				</section>
-				<section>
-					<h3>使い方</h3>
-					<ul className="list">
-						<li>
-							<p>画像を読み込む</p>
-						</li>
-						<li>
-							<p>ぐりぐりする</p>
-						</li>
-						<li>
-							<p>PCでしか動きません</p>
-						</li>
-					</ul>
-				</section>
-			</main>
+				</Window>
+			</div>
 		</div>
 	);
 }
