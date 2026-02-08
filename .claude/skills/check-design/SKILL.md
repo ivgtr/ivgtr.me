@@ -46,13 +46,13 @@ Taskツール（`subagent_type: "general-purpose"`）を使ってSubAgentを並�
 1. **デスクトップ確認 (1280x800)**
    - `mcp__playwright__browser_resize` で width: 1280, height: 800 に設定
    - `mcp__playwright__browser_navigate` で対象ページに遷移
-   - `mcp__playwright__browser_take_screenshot` で fullPage: true のスクリーンショットを撮影（filename: "desktop-{パス名}.png"）
+   - `mcp__playwright__browser_take_screenshot` で fullPage: true のスクリーンショットを撮影（filename: ".playwright-mcp/desktop-{パス名}.png"）
    - `mcp__playwright__browser_snapshot` でアクセシビリティスナップショットを取得
    - `mcp__playwright__browser_console_messages` で level: "warning" のコンソールメッセージを確認
 
 2. **モバイル確認 (375x667)**
    - `mcp__playwright__browser_resize` で width: 375, height: 667 に設定
-   - `mcp__playwright__browser_take_screenshot` で fullPage: true のスクリーンショットを撮影（filename: "mobile-{パス名}.png"）
+   - `mcp__playwright__browser_take_screenshot` で fullPage: true のスクリーンショットを撮影（filename: ".playwright-mcp/mobile-{パス名}.png"）
    - `mcp__playwright__browser_snapshot` でアクセシビリティスナップショットを取得
 
 3. **ページごとの評価**を以下の観点で実施:

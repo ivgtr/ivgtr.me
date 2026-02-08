@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDraggable } from "@/hooks/useDraggable";
+import { useResizable } from "@/hooks/useResizable";
 
 interface WindowProps {
   id: string;
@@ -14,6 +15,7 @@ interface WindowProps {
   zIndex?: number;
   closable?: boolean;
   minimizable?: boolean;
+  resizable?: boolean;
   onClose?: () => void;
   onMinimize?: () => void;
   onFocus?: () => void;
@@ -30,6 +32,7 @@ export const Window = ({
   zIndex = 10,
   closable = true,
   minimizable = true,
+  resizable = true,
   onClose,
   onMinimize,
   onFocus,
@@ -48,6 +51,21 @@ export const Window = ({
     disabled: isMobile,
   });
 
+  const shouldEnableResize = resizable && !isMobile;
+
+  const numericDefaultSize = useMemo(() => {
+    if (!defaultSize) return { width: 400 };
+    return {
+      width: typeof defaultSize.width === "number" ? defaultSize.width : 400,
+      height: typeof defaultSize.height === "number" ? defaultSize.height : undefined,
+    };
+  }, [defaultSize]);
+
+  const { isResizing, resizeHandleProps, sizeStyle: resizeSizeStyle } = useResizable({
+    defaultSize: numericDefaultSize,
+    disabled: !shouldEnableResize,
+  });
+
   const [visible, setVisible] = useState(isOpen && !isMinimized);
 
   useEffect(() => {
@@ -61,16 +79,18 @@ export const Window = ({
 
   if (!visible && (!isOpen || isMinimized)) return null;
 
-  const sizeStyle: React.CSSProperties = defaultSize
-    ? {
-        width: typeof defaultSize.width === "number" ? `${defaultSize.width}px` : defaultSize.width,
-        height: defaultSize.height
-          ? typeof defaultSize.height === "number"
-            ? `${defaultSize.height}px`
-            : defaultSize.height
-          : undefined,
-      }
-    : {};
+  const sizeStyle: React.CSSProperties = shouldEnableResize
+    ? resizeSizeStyle
+    : defaultSize
+      ? {
+          width: typeof defaultSize.width === "number" ? `${defaultSize.width}px` : defaultSize.width,
+          height: defaultSize.height
+            ? typeof defaultSize.height === "number"
+              ? `${defaultSize.height}px`
+              : defaultSize.height
+            : undefined,
+        }
+      : {};
 
   return (
     <div
@@ -81,6 +101,7 @@ export const Window = ({
         ...sizeStyle,
         zIndex,
         position: isMobile ? "relative" : "absolute",
+        ...(isResizing ? { userSelect: "none" } : undefined),
       }}
       onPointerDown={onFocus}
       data-window-id={id}
@@ -114,7 +135,16 @@ export const Window = ({
         </div>
         <div className="os-titlebar-title">{title}</div>
       </div>
-      <div className="os-window-content">{children}</div>
+      <div className="os-window-content" style={isResizing ? { pointerEvents: "none" } : undefined}>
+        {children}
+      </div>
+      {shouldEnableResize && (
+        <>
+          <div className="os-resize-handle os-resize-handle-e" {...resizeHandleProps("e")} />
+          <div className="os-resize-handle os-resize-handle-s" {...resizeHandleProps("s")} />
+          <div className="os-resize-handle os-resize-handle-se" {...resizeHandleProps("se")} />
+        </>
+      )}
     </div>
   );
 };
