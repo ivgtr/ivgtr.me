@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { faUser, faCompass, faMusic } from "@fortawesome/free-solid-svg-icons";
 import { Window } from "@/components/os/Window";
 import { StatusBar } from "@/components/os/StatusBar";
+import { DesktopIcons } from "@/components/os/DesktopIcons";
 import { useWindowManager } from "@/hooks/useWindowManager";
 import { useMenuBar } from "@/components/os/MenuBarContext";
 import { ProfileWindow } from "./(components)/ProfileWindow";
@@ -33,10 +35,16 @@ const windowTitles: Record<string, string> = {
 	audio: "Audio Player",
 };
 
+const shortTitles: Record<string, string> = {
+	profile: "Profile",
+	navigator: "Navigator",
+	audio: "Audio Player",
+};
+
 export default function Home() {
 	const [randomPositions, setRandomPositions] = useState<Record<string, { x: number; y: number }> | null>(null);
 
-	const { windows, focus, close, minimize, restore, getWindow, updatePosition } =
+	const { windows, focus, close, minimize, restore, open, getWindow, updatePosition } =
 		useWindowManager(initialWindows);
 	const { setActiveTitle } = useMenuBar();
 
@@ -57,6 +65,10 @@ export default function Home() {
 	const navigatorWin = getWindow("navigator")!;
 	const audioWin = getWindow("audio")!;
 
+	const topZIndex = windows
+		.filter((w) => w.isOpen && !w.isMinimized)
+		.reduce((max, w) => Math.max(max, w.zIndex), -1);
+
 	useEffect(() => {
 		const activeWindows = windows.filter((w) => w.isOpen && !w.isMinimized);
 		if (activeWindows.length === 0) {
@@ -69,22 +81,57 @@ export default function Home() {
 		setActiveTitle(windowTitles[topWindow.id] ?? "");
 	}, [windows, setActiveTitle]);
 
-	const minimizedWindows = windows
-		.filter((w) => w.isOpen && w.isMinimized)
-		.map((w) => ({
-			id: w.id,
-			title:
-				w.id === "profile"
-					? "Profile"
-					: w.id === "navigator"
-						? "Navigator"
-						: "Audio Player",
-			onRestore: () => restore(w.id),
-		}));
+	const handleOpenFromIcon = useCallback(
+		(id: string) => {
+			const w = getWindow(id);
+			if (!w) return;
+			if (w.isOpen && !w.isMinimized) {
+				focus(id);
+			} else if (w.isOpen && w.isMinimized) {
+				restore(id);
+			} else {
+				const base = basePositions[id as keyof typeof basePositions];
+				if (base) {
+					const pos = {
+						x: base.x + randomOffset(RANDOM_OFFSET_RANGE),
+						y: Math.max(0, base.y + randomOffset(RANDOM_OFFSET_RANGE)),
+					};
+					updatePosition(id, pos);
+					setRandomPositions((prev) => (prev ? { ...prev, [id]: pos } : { [id]: pos }));
+				}
+				open(id);
+			}
+		},
+		[getWindow, focus, restore, open, updatePosition],
+	);
+
+	const desktopIconData = [
+		{ id: "profile", label: "Profile", icon: faUser },
+		{ id: "navigator", label: "Navigator", icon: faCompass },
+		{ id: "audio", label: "Audio", icon: faMusic },
+	].map((item) => ({
+		...item,
+		onDoubleClick: () => handleOpenFromIcon(item.id),
+	}));
+
+	const taskbarWindows = windows.map((w) => ({
+		id: w.id,
+		title: shortTitles[w.id] ?? w.id,
+		isOpen: w.isOpen,
+		isMinimized: w.isMinimized,
+		isActive: w.isOpen && !w.isMinimized && w.zIndex === topZIndex,
+		closable: true,
+		onFocus: () => focus(w.id),
+		onMinimize: () => minimize(w.id),
+		onRestore: () => restore(w.id),
+		onClose: () => close(w.id),
+	}));
 
 	return (
 		<>
 			<div className="os-desktop-windows">
+				<DesktopIcons icons={desktopIconData} />
+
 				<Window
 					id="profile"
 					title="Profile - ivgtr"
@@ -94,7 +141,7 @@ export default function Home() {
 					isOpen={profileWin.isOpen}
 					isMinimized={profileWin.isMinimized}
 					zIndex={profileWin.zIndex}
-					closable={false}
+					onClose={() => close("profile")}
 					onMinimize={() => minimize("profile")}
 					onFocus={() => focus("profile")}
 				>
@@ -110,7 +157,7 @@ export default function Home() {
 					isOpen={navigatorWin.isOpen}
 					isMinimized={navigatorWin.isMinimized}
 					zIndex={navigatorWin.zIndex}
-					closable={false}
+					onClose={() => close("navigator")}
 					onMinimize={() => minimize("navigator")}
 					onFocus={() => focus("navigator")}
 				>
@@ -134,7 +181,7 @@ export default function Home() {
 				</Window>
 			</div>
 
-			<StatusBar minimizedWindows={minimizedWindows} />
+			<StatusBar taskbarWindows={taskbarWindows} />
 		</>
 	);
 }

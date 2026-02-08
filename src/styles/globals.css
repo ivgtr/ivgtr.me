@@ -619,23 +619,34 @@ ul.list {
 	gap: 4px;
 	overflow-x: auto;
 	flex: 1;
-	justify-content: center;
+	justify-content: flex-start;
 }
 
-.os-statusbar-window-btn {
+.os-taskbar-btn {
 	background: rgba(0, 212, 255, 0.1);
 	border: 1px solid var(--os-border);
 	color: var(--os-text);
 	font-size: 11px;
 	padding: 1px 8px;
 	cursor: pointer;
-	transition: background 0.15s;
+	transition: background 0.15s, border-color 0.15s, opacity 0.15s;
 	white-space: nowrap;
 }
 
-.os-statusbar-window-btn:hover {
+.os-taskbar-btn:hover {
 	background: rgba(0, 212, 255, 0.2);
 	color: var(--os-text-bright);
+}
+
+.os-taskbar-btn--active {
+	background: rgba(0, 212, 255, 0.2);
+	border-color: var(--os-accent);
+	color: var(--os-text-bright);
+}
+
+.os-taskbar-btn--minimized {
+	opacity: 0.5;
+	border-style: dashed;
 }
 
 .os-statusbar-right {
@@ -657,6 +668,50 @@ ul.list {
 	flex-direction: column;
 	max-width: 100%;
 	margin: 0;
+}
+
+/* Desktop icons */
+.os-desktop-icons {
+	position: absolute;
+	top: 12px;
+	left: 12px;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	z-index: 1;
+}
+
+.os-desktop-icon {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 4px;
+	width: 72px;
+	padding: 6px 4px;
+	background: transparent;
+	border: 1px solid transparent;
+	color: var(--os-text);
+	cursor: default;
+	font-size: 10px;
+	transition: background 0.15s, border-color 0.15s;
+}
+
+.os-desktop-icon:hover {
+	background: rgba(0, 212, 255, 0.08);
+	border-color: var(--os-border);
+}
+
+.os-desktop-icon-fa {
+	font-size: 28px;
+	color: var(--os-accent);
+	filter: drop-shadow(0 0 4px rgba(0, 212, 255, 0.3));
+}
+
+.os-desktop-icon-label {
+	text-align: center;
+	word-break: break-word;
+	line-height: 1.2;
+	text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 /* Desktop windows container (used on home page) */
@@ -1125,6 +1180,10 @@ ul.list {
 
 /* Responsive */
 @media (max-width: 767px) {
+	.os-desktop-icons {
+		display: none;
+	}
+
 	.os-desktop-windows {
 		overflow-y: auto;
 		display: flex;

@@ -2,37 +2,74 @@
 
 import { RetroVisitorCounter } from "@/components/retro/RetroVisitorCounter";
 
-interface MinimizedWindow {
-  id: string;
-  title: string;
-  onRestore: () => void;
+interface TaskbarWindow {
+	id: string;
+	title: string;
+	isOpen: boolean;
+	isMinimized: boolean;
+	isActive: boolean;
+	closable: boolean;
+	onFocus: () => void;
+	onMinimize: () => void;
+	onRestore: () => void;
+	onClose: () => void;
 }
 
 interface StatusBarProps {
-  minimizedWindows?: MinimizedWindow[];
+	taskbarWindows?: TaskbarWindow[];
 }
 
-export const StatusBar = ({ minimizedWindows = [] }: StatusBarProps) => {
-  return (
-    <div className="os-statusbar">
-      <div className="os-statusbar-left">
-        <span className="os-statusbar-indicator" />
-        <span>Connection: OK</span>
-      </div>
-      <div className="os-statusbar-center">
-        {minimizedWindows.map((w) => (
-          <button
-            key={w.id}
-            className="os-statusbar-window-btn"
-            onClick={w.onRestore}
-          >
-            {w.title}
-          </button>
-        ))}
-      </div>
-      <div className="os-statusbar-right">
-        <RetroVisitorCounter />
-      </div>
-    </div>
-  );
+export const StatusBar = ({ taskbarWindows = [] }: StatusBarProps) => {
+	const visibleWindows = taskbarWindows.filter((w) => w.isOpen);
+
+	return (
+		<div className="os-statusbar">
+			<div className="os-statusbar-left">
+				<span className="os-statusbar-indicator" />
+				<span>Connection: OK</span>
+			</div>
+			<div className="os-statusbar-center">
+				{visibleWindows.map((w) => {
+					const className = [
+						"os-taskbar-btn",
+						w.isActive && !w.isMinimized ? "os-taskbar-btn--active" : "",
+						w.isMinimized ? "os-taskbar-btn--minimized" : "",
+					]
+						.filter(Boolean)
+						.join(" ");
+
+					const handleClick = () => {
+						if (w.isMinimized) {
+							w.onRestore();
+						} else if (w.isActive) {
+							w.onMinimize();
+						} else {
+							w.onFocus();
+						}
+					};
+
+					const handleContextMenu = (e: React.MouseEvent) => {
+						e.preventDefault();
+						if (w.closable) {
+							w.onClose();
+						}
+					};
+
+					return (
+						<button
+							key={w.id}
+							className={className}
+							onClick={handleClick}
+							onContextMenu={handleContextMenu}
+						>
+							{w.title}
+						</button>
+					);
+				})}
+			</div>
+			<div className="os-statusbar-right">
+				<RetroVisitorCounter />
+			</div>
+		</div>
+	);
 };
