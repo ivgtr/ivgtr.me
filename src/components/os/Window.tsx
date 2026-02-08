@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDraggable } from "@/hooks/useDraggable";
 import { useResizable } from "@/hooks/useResizable";
 
@@ -9,6 +9,7 @@ interface WindowProps {
   title: string;
   children: React.ReactNode;
   defaultPosition?: { x: number; y: number };
+  position?: { x: number; y: number };
   defaultSize?: { width: number | string; height?: number | string };
   isOpen?: boolean;
   isMinimized?: boolean;
@@ -16,6 +17,7 @@ interface WindowProps {
   closable?: boolean;
   minimizable?: boolean;
   resizable?: boolean;
+  staggerDelay?: number;
   onClose?: () => void;
   onMinimize?: () => void;
   onFocus?: () => void;
@@ -26,6 +28,7 @@ export const Window = ({
   title,
   children,
   defaultPosition = { x: 0, y: 0 },
+  position: controlledPosition,
   defaultSize,
   isOpen = true,
   isMinimized = false,
@@ -33,6 +36,7 @@ export const Window = ({
   closable = true,
   minimizable = true,
   resizable = true,
+  staggerDelay = 0,
   onClose,
   onMinimize,
   onFocus,
@@ -46,10 +50,16 @@ export const Window = ({
     return () => window.removeEventListener("resize", check);
   }, []);
 
-  const { elementRef, dragHandleProps, style: dragStyle } = useDraggable({
+  const { elementRef, dragHandleProps, style: dragStyle, setPosition } = useDraggable({
     defaultPosition,
     disabled: isMobile,
   });
+
+  useEffect(() => {
+    if (controlledPosition) {
+      setPosition(controlledPosition);
+    }
+  }, [controlledPosition, setPosition]);
 
   const shouldEnableResize = resizable && !isMobile;
 
@@ -67,6 +77,9 @@ export const Window = ({
   });
 
   const [visible, setVisible] = useState(isOpen && !isMinimized);
+  const [initialStagger] = useState(staggerDelay);
+  const [staggerDone, setStaggerDone] = useState(false);
+  const [staggerCleared, setStaggerCleared] = useState(false);
 
   useEffect(() => {
     if (isOpen && !isMinimized) {
@@ -76,6 +89,21 @@ export const Window = ({
       return () => clearTimeout(t);
     }
   }, [isOpen, isMinimized]);
+
+  useEffect(() => {
+    if (!isOpen || isMinimized) {
+      if (!staggerCleared && initialStagger > 0) {
+        setStaggerCleared(true);
+        setStaggerDone(false);
+      }
+    }
+  }, [isOpen, isMinimized, staggerCleared, initialStagger]);
+
+  const handleAnimationEnd = useCallback((e: React.AnimationEvent) => {
+    if (e.currentTarget === e.target && e.animationName === "os-window-stagger-in") {
+      setStaggerDone(true);
+    }
+  }, []);
 
   if (!visible && (!isOpen || isMinimized)) return null;
 
@@ -92,34 +120,36 @@ export const Window = ({
         }
       : {};
 
+  const effectiveStagger = staggerCleared ? 0 : initialStagger;
+  const useStagger = effectiveStagger > 0 && !staggerDone && isOpen && !isMinimized;
+
+  const windowClassName = [
+    "os-window",
+    useStagger
+      ? "os-window-stagger-in"
+      : isOpen && !isMinimized
+        ? (staggerDone ? "" : "os-window-open")
+        : "os-window-close",
+  ].join(" ");
+
   return (
     <div
       ref={elementRef}
-      className={`os-window ${isOpen && !isMinimized ? "os-window-open" : "os-window-close"}`}
+      className={windowClassName}
       style={{
         ...dragStyle,
         ...sizeStyle,
         zIndex,
         position: isMobile ? "relative" : "absolute",
         ...(isResizing ? { userSelect: "none" } : undefined),
+        ...(useStagger ? { animationDelay: `${effectiveStagger}ms` } : undefined),
       }}
       onPointerDown={onFocus}
+      onAnimationEnd={handleAnimationEnd}
       data-window-id={id}
     >
       <div className="os-titlebar" {...dragHandleProps}>
         <div className="os-titlebar-buttons">
-          {minimizable && (
-            <button
-              className="os-titlebar-btn os-titlebar-btn-minimize"
-              onClick={(e) => {
-                e.stopPropagation();
-                onMinimize?.();
-              }}
-              aria-label="最小化"
-            >
-              <span>_</span>
-            </button>
-          )}
           {closable && (
             <button
               className="os-titlebar-btn os-titlebar-btn-close"
@@ -130,6 +160,18 @@ export const Window = ({
               aria-label="閉じる"
             >
               <span>&times;</span>
+            </button>
+          )}
+          {minimizable && (
+            <button
+              className="os-titlebar-btn os-titlebar-btn-minimize"
+              onClick={(e) => {
+                e.stopPropagation();
+                onMinimize?.();
+              }}
+              aria-label="最小化"
+            >
+              <span>_</span>
             </button>
           )}
         </div>

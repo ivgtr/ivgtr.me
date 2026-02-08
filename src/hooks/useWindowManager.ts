@@ -71,5 +71,11 @@ export function useWindowManager(initialWindows: Omit<WindowState, "zIndex">[]) 
     [windows],
   );
 
-  return { windows, focus, close, minimize, restore, open, getWindow };
+  const updatePosition = useCallback(
+    (id: string, position: { x: number; y: number }) =>
+      dispatch({ type: "updatePosition", id, position }),
+    [],
+  );
+
+  return { windows, focus, close, minimize, restore, open, getWindow, updatePosition };
 }
