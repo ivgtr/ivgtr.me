@@ -116,18 +116,6 @@ export const Window = ({
     >
       <div className="os-titlebar" {...dragHandleProps}>
         <div className="os-titlebar-buttons">
-          {minimizable && (
-            <button
-              className="os-titlebar-btn os-titlebar-btn-minimize"
-              onClick={(e) => {
-                e.stopPropagation();
-                onMinimize?.();
-              }}
-              aria-label="最小化"
-            >
-              <span>_</span>
-            </button>
-          )}
           {closable && (
             <button
               className="os-titlebar-btn os-titlebar-btn-close"
@@ -138,6 +126,18 @@ export const Window = ({
               aria-label="閉じる"
             >
               <span>&times;</span>
+            </button>
+          )}
+          {minimizable && (
+            <button
+              className="os-titlebar-btn os-titlebar-btn-minimize"
+              onClick={(e) => {
+                e.stopPropagation();
+                onMinimize?.();
+              }}
+              aria-label="最小化"
+            >
+              <span>_</span>
             </button>
           )}
         </div>
