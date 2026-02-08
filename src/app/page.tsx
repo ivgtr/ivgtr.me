@@ -7,6 +7,7 @@ import { StatusBar } from "@/components/os/StatusBar";
 import { DesktopIcons } from "@/components/os/DesktopIcons";
 import { useWindowManager } from "@/hooks/useWindowManager";
 import { useMenuBar } from "@/components/os/MenuBarContext";
+import { useBootSequence } from "@/components/os/BootSequenceContext";
 import { ProfileWindow } from "./(components)/ProfileWindow";
 import { NavigatorWindow } from "./(components)/NavigatorWindow";
 import { AudioPlayerWindow } from "./(components)/AudioPlayerWindow";
@@ -100,18 +101,24 @@ const shortTitles: Record<string, string> = {
 
 export default function Home() {
 	const [randomPositions, setRandomPositions] = useState<Record<string, { x: number; y: number }> | null>(null);
+	const [isReady, setIsReady] = useState(false);
 
 	const { windows, focus, close, minimize, restore, open, getWindow, updatePosition } =
 		useWindowManager(initialWindows);
 	const { setActiveTitle } = useMenuBar();
+	const { isPhaseReached, isComplete } = useBootSequence();
 
 	useEffect(() => {
-		if (window.innerWidth < 768) return;
+		if (window.innerWidth < 768) {
+			setIsReady(true);
+			return;
+		}
 		const newPositions = calculateRandomPositions();
 		for (const [id, pos] of Object.entries(newPositions)) {
 			updatePosition(id, pos);
 		}
 		setRandomPositions(newPositions);
+		setIsReady(true);
 	}, [updatePosition]);
 
 	const profileWin = getWindow("profile")!;
@@ -179,58 +186,68 @@ export default function Home() {
 		onClose: () => close(w.id),
 	}));
 
+	const showWindows = isReady && isPhaseReached("windows");
+	const staggerBase = isComplete ? 0 : 200;
+
 	return (
 		<>
 			<div className="os-desktop-windows">
-				<DesktopIcons icons={desktopIconData} />
+				<DesktopIcons icons={desktopIconData} visible={isPhaseReached("icons")} />
 
-				<Window
-					id="profile"
-					title="Profile - ivgtr"
-					defaultPosition={profileWin.position}
-					position={randomPositions?.profile}
-					defaultSize={{ width: 320 }}
-					isOpen={profileWin.isOpen}
-					isMinimized={profileWin.isMinimized}
-					zIndex={profileWin.zIndex}
-					onClose={() => close("profile")}
-					onMinimize={() => minimize("profile")}
-					onFocus={() => focus("profile")}
-				>
-					<ProfileWindow />
-				</Window>
+				{showWindows && (
+					<>
+						<Window
+							id="profile"
+							title="Profile - ivgtr"
+							defaultPosition={profileWin.position}
+							position={randomPositions?.profile}
+							defaultSize={{ width: 320 }}
+							isOpen={profileWin.isOpen}
+							isMinimized={profileWin.isMinimized}
+							zIndex={profileWin.zIndex}
+							staggerDelay={staggerBase * 0}
+							onClose={() => close("profile")}
+							onMinimize={() => minimize("profile")}
+							onFocus={() => focus("profile")}
+						>
+							<ProfileWindow />
+						</Window>
 
-				<Window
-					id="navigator"
-					title="Navigator - /home/ivgtr/"
-					defaultPosition={navigatorWin.position}
-					position={randomPositions?.navigator}
-					defaultSize={{ width: 520, height: 420 }}
-					isOpen={navigatorWin.isOpen}
-					isMinimized={navigatorWin.isMinimized}
-					zIndex={navigatorWin.zIndex}
-					onClose={() => close("navigator")}
-					onMinimize={() => minimize("navigator")}
-					onFocus={() => focus("navigator")}
-				>
-					<NavigatorWindow />
-				</Window>
+						<Window
+							id="navigator"
+							title="Navigator - /home/ivgtr/"
+							defaultPosition={navigatorWin.position}
+							position={randomPositions?.navigator}
+							defaultSize={{ width: 520, height: 420 }}
+							isOpen={navigatorWin.isOpen}
+							isMinimized={navigatorWin.isMinimized}
+							zIndex={navigatorWin.zIndex}
+							staggerDelay={staggerBase * 1}
+							onClose={() => close("navigator")}
+							onMinimize={() => minimize("navigator")}
+							onFocus={() => focus("navigator")}
+						>
+							<NavigatorWindow />
+						</Window>
 
-				<Window
-					id="audio"
-					title="Audio Player"
-					defaultPosition={audioWin.position}
-					position={randomPositions?.audio}
-					defaultSize={{ width: 340 }}
-					isOpen={audioWin.isOpen}
-					isMinimized={audioWin.isMinimized}
-					zIndex={audioWin.zIndex}
-					onClose={() => close("audio")}
-					onMinimize={() => minimize("audio")}
-					onFocus={() => focus("audio")}
-				>
-					<AudioPlayerWindow />
-				</Window>
+						<Window
+							id="audio"
+							title="Audio Player"
+							defaultPosition={audioWin.position}
+							position={randomPositions?.audio}
+							defaultSize={{ width: 340 }}
+							isOpen={audioWin.isOpen}
+							isMinimized={audioWin.isMinimized}
+							zIndex={audioWin.zIndex}
+							staggerDelay={staggerBase * 2}
+							onClose={() => close("audio")}
+							onMinimize={() => minimize("audio")}
+							onFocus={() => focus("audio")}
+						>
+							<AudioPlayerWindow />
+						</Window>
+					</>
+				)}
 			</div>
 
 			<StatusBar taskbarWindows={taskbarWindows} />
