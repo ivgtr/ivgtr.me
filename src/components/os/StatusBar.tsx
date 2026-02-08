@@ -1,6 +1,7 @@
 "use client";
 
 import { RetroVisitorCounter } from "@/components/retro/RetroVisitorCounter";
+import { useBootSequence } from "@/components/os/BootSequenceContext";
 
 interface TaskbarWindow {
 	id: string;
@@ -20,10 +21,19 @@ interface StatusBarProps {
 }
 
 export const StatusBar = ({ taskbarWindows = [] }: StatusBarProps) => {
+	const { isPhaseReached, isComplete } = useBootSequence();
 	const visibleWindows = taskbarWindows.filter((w) => w.isOpen);
 
+	const barClassName = [
+		"os-statusbar",
+		!isComplete && !isPhaseReached("statusbar") ? "os-boot-hidden" : "",
+		!isComplete && isPhaseReached("statusbar") ? "os-boot-slide-up" : "",
+	]
+		.filter(Boolean)
+		.join(" ");
+
 	return (
-		<div className="os-statusbar">
+		<div className={barClassName}>
 			<div className="os-statusbar-left">
 				<span className="os-statusbar-indicator" />
 				<span>Connection: OK</span>

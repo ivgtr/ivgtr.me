@@ -12,11 +12,19 @@ interface DesktopIcon {
 
 interface DesktopIconsProps {
 	icons: DesktopIcon[];
+	visible?: boolean;
 }
 
-export const DesktopIcons = ({ icons }: DesktopIconsProps) => {
+export const DesktopIcons = ({ icons, visible = true }: DesktopIconsProps) => {
+	const className = [
+		"os-desktop-icons",
+		!visible ? "os-boot-hidden" : "os-boot-fade-in",
+	]
+		.filter(Boolean)
+		.join(" ");
+
 	return (
-		<div className="os-desktop-icons">
+		<div className={className}>
 			{icons.map((item) => (
 				<button
 					key={item.id}
