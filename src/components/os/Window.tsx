@@ -9,6 +9,7 @@ interface WindowProps {
   title: string;
   children: React.ReactNode;
   defaultPosition?: { x: number; y: number };
+  position?: { x: number; y: number };
   defaultSize?: { width: number | string; height?: number | string };
   isOpen?: boolean;
   isMinimized?: boolean;
@@ -26,6 +27,7 @@ export const Window = ({
   title,
   children,
   defaultPosition = { x: 0, y: 0 },
+  position: controlledPosition,
   defaultSize,
   isOpen = true,
   isMinimized = false,
@@ -46,10 +48,16 @@ export const Window = ({
     return () => window.removeEventListener("resize", check);
   }, []);
 
-  const { elementRef, dragHandleProps, style: dragStyle } = useDraggable({
+  const { elementRef, dragHandleProps, style: dragStyle, setPosition } = useDraggable({
     defaultPosition,
     disabled: isMobile,
   });
+
+  useEffect(() => {
+    if (controlledPosition) {
+      setPosition(controlledPosition);
+    }
+  }, [controlledPosition, setPosition]);
 
   const shouldEnableResize = resizable && !isMobile;
 

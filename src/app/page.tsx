@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Window } from "@/components/os/Window";
 import { StatusBar } from "@/components/os/StatusBar";
 import { useWindowManager } from "@/hooks/useWindowManager";
@@ -9,10 +9,22 @@ import { ProfileWindow } from "./(components)/ProfileWindow";
 import { NavigatorWindow } from "./(components)/NavigatorWindow";
 import { AudioPlayerWindow } from "./(components)/AudioPlayerWindow";
 
+const basePositions = {
+	profile: { x: 16, y: 16 },
+	navigator: { x: 380, y: 16 },
+	audio: { x: 16, y: 480 },
+};
+
+const RANDOM_OFFSET_RANGE = 30;
+
+function randomOffset(range: number) {
+	return Math.round(Math.random() * range * 2 - range);
+}
+
 const initialWindows = [
-	{ id: "profile", isOpen: true, isMinimized: false, position: { x: 16, y: 16 } },
-	{ id: "navigator", isOpen: true, isMinimized: false, position: { x: 380, y: 16 } },
-	{ id: "audio", isOpen: true, isMinimized: false, position: { x: 16, y: 480 } },
+	{ id: "profile", isOpen: true, isMinimized: false, position: basePositions.profile },
+	{ id: "navigator", isOpen: true, isMinimized: false, position: basePositions.navigator },
+	{ id: "audio", isOpen: true, isMinimized: false, position: basePositions.audio },
 ];
 
 const windowTitles: Record<string, string> = {
@@ -22,9 +34,33 @@ const windowTitles: Record<string, string> = {
 };
 
 export default function Home() {
-	const { windows, focus, close, minimize, restore, getWindow } =
+	const [randomPositions, setRandomPositions] = useState<Record<string, { x: number; y: number }> | null>(null);
+
+	const { windows, focus, close, minimize, restore, getWindow, updatePosition } =
 		useWindowManager(initialWindows);
 	const { setActiveTitle } = useMenuBar();
+
+	useEffect(() => {
+		const vw = window.innerWidth;
+		const vh = window.innerHeight;
+		const windowSizes: Record<string, { w: number; h: number }> = {
+			profile: { w: 320, h: 400 },
+			navigator: { w: 520, h: 420 },
+			audio: { w: 340, h: 200 },
+		};
+
+		const newPositions: Record<string, { x: number; y: number }> = {};
+		for (const [id, base] of Object.entries(basePositions)) {
+			const size = windowSizes[id] ?? { w: 400, h: 400 };
+			const pos = {
+				x: Math.max(0, Math.min(base.x + randomOffset(RANDOM_OFFSET_RANGE), vw - size.w)),
+				y: Math.max(0, Math.min(base.y + randomOffset(RANDOM_OFFSET_RANGE), vh - size.h)),
+			};
+			newPositions[id] = pos;
+			updatePosition(id, pos);
+		}
+		setRandomPositions(newPositions);
+	}, [updatePosition]);
 
 	const profileWin = getWindow("profile")!;
 	const navigatorWin = getWindow("navigator")!;
@@ -62,6 +98,7 @@ export default function Home() {
 					id="profile"
 					title="Profile - ivgtr"
 					defaultPosition={profileWin.position}
+					position={randomPositions?.profile}
 					defaultSize={{ width: 320 }}
 					isOpen={profileWin.isOpen}
 					isMinimized={profileWin.isMinimized}
@@ -77,6 +114,7 @@ export default function Home() {
 					id="navigator"
 					title="Navigator - /home/ivgtr/"
 					defaultPosition={navigatorWin.position}
+					position={randomPositions?.navigator}
 					defaultSize={{ width: 520, height: 420 }}
 					isOpen={navigatorWin.isOpen}
 					isMinimized={navigatorWin.isMinimized}
@@ -92,6 +130,7 @@ export default function Home() {
 					id="audio"
 					title="Audio Player"
 					defaultPosition={audioWin.position}
+					position={randomPositions?.audio}
 					defaultSize={{ width: 340 }}
 					isOpen={audioWin.isOpen}
 					isMinimized={audioWin.isMinimized}
