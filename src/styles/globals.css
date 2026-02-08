@@ -758,6 +758,49 @@ ul.list {
 	font-size: 14px;
 }
 
+/* Resize Handles */
+.os-resize-handle {
+	position: absolute;
+	z-index: 10;
+	touch-action: none;
+}
+
+.os-resize-handle-e {
+	right: 0;
+	top: 0;
+	bottom: 0;
+	width: 6px;
+	cursor: ew-resize;
+}
+
+.os-resize-handle-s {
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 6px;
+	cursor: ns-resize;
+}
+
+.os-resize-handle-se {
+	right: 0;
+	bottom: 0;
+	width: 12px;
+	height: 12px;
+	cursor: nwse-resize;
+}
+
+.os-resize-handle-se::after {
+	content: "";
+	position: absolute;
+	right: 2px;
+	bottom: 2px;
+	width: 0;
+	height: 0;
+	border-style: solid;
+	border-width: 0 0 8px 8px;
+	border-color: transparent transparent var(--os-border) transparent;
+}
+
 /* Profile Window */
 .os-profile {
 	display: flex;
@@ -1073,6 +1116,10 @@ ul.list {
 	}
 
 	.os-menubar-center {
+		display: none;
+	}
+
+	.os-resize-handle {
 		display: none;
 	}
 }
