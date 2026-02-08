@@ -37,20 +37,7 @@ export function useDraggable({ defaultPosition = { x: 0, y: 0 }, disabled = fals
       let newX = e.clientX - dragStart.current.x;
       let newY = e.clientY - dragStart.current.y;
 
-      const el = elementRef.current;
-      if (el) {
-        const rect = el.getBoundingClientRect();
-        const parentRect = el.offsetParent?.getBoundingClientRect() ?? {
-          left: 0,
-          top: 0,
-          width: window.innerWidth,
-          height: window.innerHeight,
-        };
-        const maxX = parentRect.width - rect.width;
-        const maxY = parentRect.height - rect.height;
-        newX = Math.max(0, Math.min(newX, maxX));
-        newY = Math.max(0, Math.min(newY, maxY));
-      }
+      newY = Math.max(0, newY);
 
       setPosition({ x: newX, y: newY });
     },

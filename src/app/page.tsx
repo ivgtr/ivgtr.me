@@ -41,20 +41,11 @@ export default function Home() {
 	const { setActiveTitle } = useMenuBar();
 
 	useEffect(() => {
-		const vw = window.innerWidth;
-		const vh = window.innerHeight;
-		const windowSizes: Record<string, { w: number; h: number }> = {
-			profile: { w: 320, h: 400 },
-			navigator: { w: 520, h: 420 },
-			audio: { w: 340, h: 200 },
-		};
-
 		const newPositions: Record<string, { x: number; y: number }> = {};
 		for (const [id, base] of Object.entries(basePositions)) {
-			const size = windowSizes[id] ?? { w: 400, h: 400 };
 			const pos = {
-				x: Math.max(0, Math.min(base.x + randomOffset(RANDOM_OFFSET_RANGE), vw - size.w)),
-				y: Math.max(0, Math.min(base.y + randomOffset(RANDOM_OFFSET_RANGE), vh - size.h)),
+				x: base.x + randomOffset(RANDOM_OFFSET_RANGE),
+				y: Math.max(0, base.y + randomOffset(RANDOM_OFFSET_RANGE)),
 			};
 			newPositions[id] = pos;
 			updatePosition(id, pos);
