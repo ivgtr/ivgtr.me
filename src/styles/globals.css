@@ -1181,7 +1181,31 @@ ul.list {
 /* Responsive */
 @media (max-width: 767px) {
 	.os-desktop-icons {
-		display: none;
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		flex-direction: row;
+		flex-wrap: wrap;
+		align-content: flex-start;
+		justify-content: flex-start;
+		gap: 4px;
+		padding: 8px 4px;
+		z-index: 0;
+		pointer-events: none;
+	}
+
+	.os-desktop-icon {
+		width: auto;
+		min-width: 64px;
+		padding: 4px 8px;
+		font-size: 9px;
+		pointer-events: auto;
+	}
+
+	.os-desktop-icon-fa {
+		font-size: 22px;
 	}
 
 	.os-desktop-windows {

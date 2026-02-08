@@ -170,6 +170,7 @@ export default function Home() {
 		{ id: "audio", label: "Audio", icon: faMusic },
 	].map((item) => ({
 		...item,
+		onClick: () => handleOpenFromIcon(item.id),
 		onDoubleClick: () => handleOpenFromIcon(item.id),
 	}));
 

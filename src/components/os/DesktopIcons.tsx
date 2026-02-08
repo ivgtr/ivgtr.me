@@ -7,7 +7,8 @@ interface DesktopIcon {
 	id: string;
 	label: string;
 	icon: IconDefinition;
-	onDoubleClick: () => void;
+	onClick?: () => void;
+	onDoubleClick?: () => void;
 }
 
 interface DesktopIconsProps {
@@ -29,6 +30,7 @@ export const DesktopIcons = ({ icons, visible = true }: DesktopIconsProps) => {
 				<button
 					key={item.id}
 					className="os-desktop-icon"
+					onClick={item.onClick}
 					onDoubleClick={item.onDoubleClick}
 				>
 					<FontAwesomeIcon icon={item.icon} className="os-desktop-icon-fa" />
