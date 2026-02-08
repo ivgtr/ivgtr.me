@@ -8,6 +8,7 @@ import "@/styles/globals.css";
 import { DesktopBackground } from "@/components/os/DesktopBackground";
 import { KonamiProvider } from "@/components/retro/KonamiProvider";
 import { MenuBarProvider } from "@/components/os/MenuBarContext";
+import { BootSequenceProvider } from "@/components/os/BootSequenceContext";
 import { MenuBar } from "@/components/os/MenuBar";
 
 export const metadata: Metadata = {
@@ -25,9 +26,11 @@ export default function RootLayout({
 			<body className={`${marumonica.variable} ${aahub.variable} os-site`}>
 				<KonamiProvider>
 					<MenuBarProvider>
-						<DesktopBackground />
-						<MenuBar />
-						<main className="os-workspace">{children}</main>
+						<BootSequenceProvider>
+							<DesktopBackground />
+							<MenuBar />
+							<main className="os-workspace">{children}</main>
+						</BootSequenceProvider>
 					</MenuBarProvider>
 				</KonamiProvider>
 			</body>

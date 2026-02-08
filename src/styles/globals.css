@@ -1214,6 +1214,65 @@ ul.list {
 	}
 }
 
+/* Boot Sequence Animations */
+.os-boot-hidden {
+	opacity: 0;
+	visibility: hidden;
+}
+
+@keyframes os-boot-fade-in {
+	from { opacity: 0; }
+	to { opacity: 1; }
+}
+
+@keyframes os-boot-slide-down {
+	from { opacity: 0; transform: translateY(-100%); }
+	to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes os-boot-slide-up {
+	from { opacity: 0; transform: translateY(100%); }
+	to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes os-window-stagger-in {
+	from { opacity: 0; transform: scale(0.95); }
+	to { opacity: 1; transform: scale(1); }
+}
+
+.os-boot-fade-in {
+	animation: os-boot-fade-in 0.3s ease-out forwards;
+}
+
+.os-boot-slide-down {
+	animation: os-boot-slide-down 0.3s ease-out forwards;
+}
+
+.os-boot-slide-up {
+	animation: os-boot-slide-up 0.3s ease-out forwards;
+}
+
+.os-window-stagger-in {
+	animation: os-window-stagger-in 0.3s ease-out backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.os-boot-fade-in,
+	.os-boot-slide-down,
+	.os-boot-slide-up,
+	.os-window-stagger-in {
+		animation: none;
+		opacity: 1;
+		transform: none;
+		visibility: visible;
+	}
+
+	.os-boot-hidden {
+		opacity: 1;
+		visibility: visible;
+	}
+}
+
 /* RetroVisitorCounter override for StatusBar */
 .os-statusbar-right .os-visitor-inline {
 	color: var(--os-green);
