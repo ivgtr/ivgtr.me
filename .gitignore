@@ -40,8 +40,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# development screenshots
-copland-os-*.png
-
 # playwright mcp
 .playwright-mcp/
+/*.png
+/*.jpeg
+/*.jpg
