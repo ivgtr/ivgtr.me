@@ -11,22 +11,79 @@ import { ProfileWindow } from "./(components)/ProfileWindow";
 import { NavigatorWindow } from "./(components)/NavigatorWindow";
 import { AudioPlayerWindow } from "./(components)/AudioPlayerWindow";
 
-const basePositions = {
+const windowSizes: Record<string, { width: number; height: number }> = {
+	profile: { width: 320, height: 400 },
+	navigator: { width: 520, height: 420 },
+	audio: { width: 340, height: 200 },
+};
+
+const windowZones: { id: string; col: number; row: number }[] = [
+	{ id: "profile", col: 0, row: 0 },
+	{ id: "navigator", col: 1, row: 0 },
+	{ id: "audio", col: 0, row: 1 },
+];
+
+const fallbackPositions: Record<string, { x: number; y: number }> = {
 	profile: { x: 16, y: 16 },
 	navigator: { x: 380, y: 16 },
 	audio: { x: 16, y: 480 },
 };
 
-const RANDOM_OFFSET_RANGE = 30;
+function calculateRandomPositions(): Record<string, { x: number; y: number }> {
+	const screenW = window.innerWidth;
+	const screenH = window.innerHeight;
 
-function randomOffset(range: number) {
-	return Math.round(Math.random() * range * 2 - range);
+	const DESKTOP_ICONS_WIDTH = 96;
+	const MENU_BAR_HEIGHT = 32;
+	const STATUS_BAR_HEIGHT = 28;
+	const PADDING = 8;
+
+	const availableX = DESKTOP_ICONS_WIDTH;
+	const availableY = MENU_BAR_HEIGHT;
+	const availableW = screenW - DESKTOP_ICONS_WIDTH - PADDING;
+	const availableH = screenH - MENU_BAR_HEIGHT - STATUS_BAR_HEIGHT - PADDING;
+
+	const cols = 2;
+	const rows = 2;
+	const zoneW = availableW / cols;
+	const zoneH = availableH / rows;
+
+	const positions: Record<string, { x: number; y: number }> = {};
+
+	for (const zone of windowZones) {
+		const winSize = windowSizes[zone.id];
+		if (!winSize) continue;
+
+		const zoneLeft = availableX + zone.col * zoneW;
+		const zoneTop = availableY + zone.row * zoneH;
+
+		const maxOffsetX = zoneW - winSize.width - PADDING;
+		const maxOffsetY = zoneH - winSize.height - PADDING;
+
+		let x: number;
+		let y: number;
+
+		if (maxOffsetX > 0 && maxOffsetY > 0) {
+			x = zoneLeft + Math.round(Math.random() * maxOffsetX);
+			y = zoneTop + Math.round(Math.random() * maxOffsetY);
+		} else {
+			x = zoneLeft + PADDING;
+			y = zoneTop + PADDING;
+		}
+
+		x = Math.max(0, Math.min(x, screenW - winSize.width));
+		y = Math.max(0, Math.min(y, screenH - winSize.height - STATUS_BAR_HEIGHT));
+
+		positions[zone.id] = { x, y };
+	}
+
+	return positions;
 }
 
 const initialWindows = [
-	{ id: "profile", isOpen: true, isMinimized: false, position: basePositions.profile },
-	{ id: "navigator", isOpen: true, isMinimized: false, position: basePositions.navigator },
-	{ id: "audio", isOpen: true, isMinimized: false, position: basePositions.audio },
+	{ id: "profile", isOpen: true, isMinimized: false, position: fallbackPositions.profile },
+	{ id: "navigator", isOpen: true, isMinimized: false, position: fallbackPositions.navigator },
+	{ id: "audio", isOpen: true, isMinimized: false, position: fallbackPositions.audio },
 ];
 
 const windowTitles: Record<string, string> = {
@@ -49,13 +106,9 @@ export default function Home() {
 	const { setActiveTitle } = useMenuBar();
 
 	useEffect(() => {
-		const newPositions: Record<string, { x: number; y: number }> = {};
-		for (const [id, base] of Object.entries(basePositions)) {
-			const pos = {
-				x: base.x + randomOffset(RANDOM_OFFSET_RANGE),
-				y: Math.max(0, base.y + randomOffset(RANDOM_OFFSET_RANGE)),
-			};
-			newPositions[id] = pos;
+		if (window.innerWidth < 768) return;
+		const newPositions = calculateRandomPositions();
+		for (const [id, pos] of Object.entries(newPositions)) {
 			updatePosition(id, pos);
 		}
 		setRandomPositions(newPositions);
@@ -90,14 +143,13 @@ export default function Home() {
 			} else if (w.isOpen && w.isMinimized) {
 				restore(id);
 			} else {
-				const base = basePositions[id as keyof typeof basePositions];
-				if (base) {
-					const pos = {
-						x: base.x + randomOffset(RANDOM_OFFSET_RANGE),
-						y: Math.max(0, base.y + randomOffset(RANDOM_OFFSET_RANGE)),
-					};
-					updatePosition(id, pos);
-					setRandomPositions((prev) => (prev ? { ...prev, [id]: pos } : { [id]: pos }));
+				if (window.innerWidth >= 768) {
+					const newPositions = calculateRandomPositions();
+					const pos = newPositions[id];
+					if (pos) {
+						updatePosition(id, pos);
+						setRandomPositions((prev) => (prev ? { ...prev, [id]: pos } : { [id]: pos }));
+					}
 				}
 				open(id);
 			}
