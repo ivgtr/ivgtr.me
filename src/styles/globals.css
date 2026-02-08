@@ -1007,6 +1007,31 @@ ul.list {
 
 .os-navigator-tool-content {
 	font-size: 14px;
+	padding: 8px 12px;
+}
+
+/* Navigator内 crop-icon等ツールのレイアウト調整 */
+.os-navigator-tool-content .relative.h-72.mt-12 {
+	margin-top: 0;
+	height: 12rem;
+	overflow: hidden;
+	background: rgba(10, 10, 24, 0.8);
+	border-radius: 4px;
+	border: 1px solid var(--os-border);
+}
+
+.os-navigator-tool-content .relative.h-72.mt-12 img {
+	height: 100%;
+	object-fit: contain;
+}
+
+.os-navigator-tool-content input,
+.os-navigator-tool-content select {
+	min-width: 0;
+	box-sizing: border-box;
+	border-color: var(--os-border);
+	color: var(--os-text-bright);
+	background: #0a0a18;
 }
 
 /* Audio Player Window */
