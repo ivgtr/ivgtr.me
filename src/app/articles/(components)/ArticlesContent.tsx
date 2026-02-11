@@ -18,28 +18,37 @@ export const ArticlesContent = () => {
 	if (!data) {
 		return <p>記事を取得中...</p>;
 	}
+	const hasAnyArticles = Object.values(data).some((articles) => articles.length > 0);
+
+	if (!hasAnyArticles) {
+		return <p>記事がありません</p>;
+	}
 
 	return (
 		<ul className="list">
 			{Object.entries(data).map(([site, articles]) => (
 				<li key={site}>
 					<h2>{site}</h2>
-					<ul>
-						{articles.map((article) => (
-							<li key={article.url}>
-								<p>
-									<FormattedDate date={article.created} />-{" "}
-									<Link
-										href={article.url}
-										target="_blank"
-										className={clsx("hover:underline", "text-blue-500")}
-									>
-										{article.title}
-									</Link>
-								</p>
-							</li>
-						))}
-					</ul>
+					{articles.length === 0 ? (
+						<p>記事がありません</p>
+					) : (
+						<ul>
+							{articles.map((article) => (
+								<li key={article.url}>
+									<p>
+										<FormattedDate date={article.created} />-{" "}
+										<Link
+											href={article.url}
+											target="_blank"
+											className={clsx("hover:underline", "text-blue-500")}
+										>
+											{article.title}
+										</Link>
+									</p>
+								</li>
+							))}
+						</ul>
+					)}
 				</li>
 			))}
 		</ul>
