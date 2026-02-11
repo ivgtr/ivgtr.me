@@ -28,15 +28,21 @@ export async function GET() {
 		{} as Record<Site, Article[]>,
 	);
 
-	try {
-		const parser = new XMLParser();
-		await Promise.all(
-			articleSources.map(async (source) => {
+	const parser = new XMLParser();
+	await Promise.allSettled(
+		articleSources.map(async (source) => {
+			try {
 				const response = await fetch(source.url);
+				if (!response.ok) {
+					throw new Error(`HTTP ${response.status}`);
+				}
 				if (source.site === "Qita") {
 					const text = await response.text();
 					const data = parser.parse(text);
-					const articles = data.feed.entry as {
+					const rawArticles = data.feed?.entry ?? [];
+					const articles = (Array.isArray(rawArticles)
+						? rawArticles
+						: [rawArticles]) as {
 						title: string;
 						url: string;
 						published: string;
@@ -56,7 +62,10 @@ export async function GET() {
 				} else if (source.site === "Hatena") {
 					const text = await response.text();
 					const data = parser.parse(text);
-					const articles = data.rss.channel.item as {
+					const rawArticles = data.rss?.channel?.item ?? [];
+					const articles = (Array.isArray(rawArticles)
+						? rawArticles
+						: [rawArticles]) as {
 						title: string;
 						link: string;
 						pubDate: string;
@@ -75,7 +84,10 @@ export async function GET() {
 				} else if (source.site === "Scrapbox") {
 					const data = await response.json();
 					const pjName = data.projectName;
-					const articles = data.pages as {
+					const rawArticles = data.pages ?? [];
+					const articles = (Array.isArray(rawArticles)
+						? rawArticles
+						: [rawArticles]) as {
 						title: string;
 						created: number;
 					}[];
@@ -91,11 +103,11 @@ export async function GET() {
 						}))
 						.splice(0, 5);
 				}
-			}),
-		);
-	} catch (error) {
-		console.error(error);
-	}
+			} catch (error) {
+				console.error(`[articles] failed to fetch ${source.site}`, error);
+			}
+		}),
+	);
 
 	return NextResponse.json(articleObject);
 }

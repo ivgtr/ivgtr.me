@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import Link from "next/link";
-import { ToolsContent } from "@/app/tools/(components)/ToolsContent";
 import { ArticlesContent } from "@/app/articles/(components)/ArticlesContent";
+import { ProjectsContent } from "@/app/projects/(components)/ProjectsContent";
 
 import { ClopIcon } from "@/app/tools/crop-icon/(components)/ClopIcon";
 import { GlitchImage } from "@/app/tools/glitch-image/(components)/GlitchImage";
@@ -17,6 +16,7 @@ type Screen =
   | { type: "home" }
   | { type: "tools" }
   | { type: "articles" }
+  | { type: "projects" }
   | { type: "tool-detail"; tool: string };
 
 const toolComponents: Record<string, { name: string; component: React.ReactNode }> = {
@@ -59,6 +59,8 @@ export const NavigatorWindow = () => {
         return "/home/ivgtr/tools/";
       case "articles":
         return "/home/ivgtr/articles/";
+      case "projects":
+        return "/home/ivgtr/projects/";
       case "tool-detail":
         return `/home/ivgtr/tools/${screen.tool}/`;
     }
@@ -94,6 +96,13 @@ export const NavigatorWindow = () => {
               <span className="os-folder-icon">&#128193;</span>
               <span>Articles</span>
             </button>
+            <button
+              className="os-navigator-folder"
+              onClick={() => navigate({ type: "projects" })}
+            >
+              <span className="os-folder-icon">&#128193;</span>
+              <span>Projects</span>
+            </button>
           </div>
         )}
 
@@ -116,6 +125,12 @@ export const NavigatorWindow = () => {
         {screen.type === "articles" && (
           <div className="os-navigator-articles">
             <ArticlesContent />
+          </div>
+        )}
+
+        {screen.type === "projects" && (
+          <div className="os-navigator-projects">
+            <ProjectsContent />
           </div>
         )}
 
